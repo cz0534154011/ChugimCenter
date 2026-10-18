@@ -12,7 +12,9 @@ namespace ChugimCenter.Infrastructure.Repositories;
 public class EnrollmentRepository(AppDbContext context) : Repository<Enrollment>(context), IEnrollmentRepository
 {
     public Task<Enrollment?> GetWithGroupAsync(int id, CancellationToken ct)
-        => Set.Include(e => e.CourseGroup)
+        => Set.Include(e => e.User)
+              .Include(e => e.CourseGroup)
+                  .ThenInclude(g => g.Category)
               .FirstOrDefaultAsync(e => e.Id == id, ct);
 
     public Task<bool> HasActiveEnrollmentAsync(int userId, int groupId, CancellationToken ct)
