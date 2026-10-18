@@ -10,7 +10,9 @@ public abstract class AccountRequestDto
     public string FullName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "האימייל הוא שדה חובה")]
-    [EmailAddress(ErrorMessage = "כתובת האימייל אינה תקינה")]
+    // לא [EmailAddress]: הוא מקבל גם רווחים באמצע הכתובת (למשל "ru  th@example.com").
+    // כאן: @ אחד, נקודה אחרי ה-@, ובלי רווחים בתוך הכתובת. רווחים בהתחלה ובסוף מותרים – EmailNormalizer מסיר אותם
+    [RegularExpression(@"^\s*[^@\s]+@[^@\s]+\.[^@\s]+\s*$", ErrorMessage = "כתובת האימייל אינה תקינה")]
     [MaxLength(100, ErrorMessage = "האימייל יכול להכיל עד 100 תווים")]
     public string Email { get; set; } = string.Empty;
 
