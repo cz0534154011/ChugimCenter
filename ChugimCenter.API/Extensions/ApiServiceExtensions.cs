@@ -79,10 +79,10 @@ public static class ApiServiceExtensions
                     OnChallenge = context =>
                     {
                         context.HandleResponse();
-                        return WriteErrorAsync(context.HttpContext, StatusCodes.Status401Unauthorized, "יש להתחבר למערכת");
+                        return ErrorResponseFactory.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized, "יש להתחבר למערכת");
                     },
                     OnForbidden = context =>
-                        WriteErrorAsync(context.HttpContext, StatusCodes.Status403Forbidden, "אין לך הרשאה לפעולה זו")
+                        ErrorResponseFactory.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden, "אין לך הרשאה לפעולה זו")
                 };
             });
 
@@ -131,11 +131,5 @@ public static class ApiServiceExtensions
                   .AllowAnyMethod()));
 
         return services;
-    }
-
-    private static Task WriteErrorAsync(HttpContext context, int status, string message)
-    {
-        context.Response.StatusCode = status;
-        return context.Response.WriteAsJsonAsync(ErrorResponseFactory.Create(context, status, message));
     }
 }
