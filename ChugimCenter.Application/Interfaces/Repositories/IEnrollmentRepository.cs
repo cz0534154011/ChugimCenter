@@ -6,7 +6,7 @@ namespace ChugimCenter.Application.Interfaces.Repositories;
 
 public interface IEnrollmentRepository : IRepository<Enrollment>
 {
-    /// <summary>רישום יחד עם הקבוצה שלו, במצב מעקב (לביטול ולסימון תשלום).</summary>
+    /// <summary>רישום יחד עם המשתתפת, הקבוצה והתחום, במצב מעקב (לביטול ולסימון תשלום).</summary>
     Task<Enrollment?> GetWithGroupAsync(int id, CancellationToken ct);
 
     Task<bool> HasActiveEnrollmentAsync(int userId, int groupId, CancellationToken ct);
