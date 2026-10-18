@@ -7,6 +7,7 @@ namespace ChugimCenter.Application.Interfaces.Services;
 public interface IEnrollmentService
 {
     Task<Result<EnrollmentDto>> EnrollAsync(CreateEnrollmentDto dto, CurrentUser user, CancellationToken ct);
+    Task<Result<EnrollmentDto>> GetByIdAsync(int enrollmentId, CurrentUser user, CancellationToken ct);
     Task<Result> CancelAsync(int enrollmentId, CurrentUser user, CancellationToken ct);
 
     Task<PagedResult<EnrollmentDto>> GetMineAsync(EnrollmentQueryDto query, int userId, CancellationToken ct);

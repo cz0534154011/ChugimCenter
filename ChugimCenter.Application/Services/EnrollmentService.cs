@@ -85,6 +85,19 @@ public class EnrollmentService(
         return await GetDtoAsync(enrollment.Id, ct);
     }
 
+    /// <summary>רישום בודד: רק בעלת הרישום או המנהלת. משתתפת אחרת מקבלת 403.</summary>
+    public async Task<Result<EnrollmentDto>> GetByIdAsync(int enrollmentId, CurrentUser user, CancellationToken ct)
+    {
+        var enrollment = await enrollments.GetWithGroupAsync(enrollmentId, ct);
+        if (enrollment is null)
+            return NotFound<EnrollmentDto>(enrollmentId);
+
+        if (!user.IsAdmin && enrollment.UserId != user.Id)
+            return Result<EnrollmentDto>.Failure(ErrorType.Forbidden, "אין לך הרשאה לצפות ברישום זה");
+
+        return Result<EnrollmentDto>.Success(mapper.Map<EnrollmentDto>(enrollment));
+    }
+
     /// <summary>
     /// ביטול: השורה לא נמחקת, רק הסטטוס משתנה, ומספר הנרשמות קטן – באותה שמירה ועם אותה הגנת גרסה.
     /// רישום מחדש אחר כך ייצור שורה חדשה, והישנה תישאר בהיסטוריה.
