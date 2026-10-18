@@ -1,0 +1,11 @@
+﻿<Project>
+  <!--
+    השתקה של חולשה אחת בלבד ב-AutoMapper 14 (CVE-2026-32933).
+    סעיף 8 בהוראות דורש AutoMapper, והתיקון קיים רק בגרסאות בתשלום.
+    אין סיכון בפרויקט: ממפים רק DTOs שטוחים, ו-ASP.NET Core מגביל עומק JSON ל-64.
+    כלל: לא ממפים ישות לישות, ולא יוצרים DTO שמכיל רשימה של עצמו.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+  </ItemGroup>
+</Project>

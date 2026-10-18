@@ -16,6 +16,12 @@ public class Result
 
     public static Result Success() => new(true, null, null);
     public static Result Failure(ErrorType type, string error) => new(false, type, error);
+
+    /// <summary>
+    /// מעביר כישלון הלאה, כתוצאה מסוג אחר (למשל מ-Result&lt;User&gt; ל-Result&lt;UserDto&gt;).
+    /// נקרא רק על תוצאה שנכשלה.
+    /// </summary>
+    public Result<T> ToFailure<T>() => Result<T>.Failure(ErrorType!.Value, Error!);
 }
 
 /// <summary>תוצאה של פעולה שמחזירה נתונים מסוג T.</summary>

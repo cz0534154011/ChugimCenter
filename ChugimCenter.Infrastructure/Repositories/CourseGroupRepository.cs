@@ -60,6 +60,7 @@ public class CourseGroupRepository(AppDbContext context) : Repository<CourseGrou
     public Task<List<CourseGroup>> GetByInstructorAsync(int instructorId, CancellationToken ct)
         => Set.AsNoTracking()
               .Include(g => g.Category)
+              .Include(g => g.Instructor)
               .Where(g => g.InstructorId == instructorId)
               .OrderBy(g => g.DayOfWeek)
               .ThenBy(g => g.StartTime)
