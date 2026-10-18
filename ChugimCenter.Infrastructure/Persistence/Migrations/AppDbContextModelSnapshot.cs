@@ -258,6 +258,15 @@ namespace ChugimCenter.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("EnrolledAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("PaidById")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -269,6 +278,8 @@ namespace ChugimCenter.Infrastructure.Persistence.Migrations
                     b.HasIndex("CancelledById");
 
                     b.HasIndex("CourseGroupId");
+
+                    b.HasIndex("PaidById");
 
                     b.HasIndex("UserId", "CourseGroupId")
                         .IsUnique()
@@ -282,6 +293,7 @@ namespace ChugimCenter.Infrastructure.Persistence.Migrations
                             Id = 1,
                             CourseGroupId = 3,
                             EnrolledAt = new DateTime(2026, 10, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsPaid = false,
                             Status = 1,
                             UserId = 4
                         });
@@ -437,6 +449,11 @@ namespace ChugimCenter.Infrastructure.Persistence.Migrations
                         .HasForeignKey("CourseGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("ChugimCenter.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("PaidById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ChugimCenter.Domain.Entities.User", "User")
                         .WithMany("Enrollments")

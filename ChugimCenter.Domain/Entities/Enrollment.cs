@@ -19,5 +19,8 @@ public class Enrollment
     public DateTime? CancelledAt { get; set; }
     public int? CancelledById { get; set; }
 
-    // שדות התשלום יתווספו בשלב 4, יחד עם ה-Migration השנייה (AddPayment)
+    // שדות התשלום – נוספו ב-Migration השנייה (AddPayment)
+    public bool IsPaid { get; set; }        // ברירת מחדל: לא שולם
+    public DateTime? PaidAt { get; set; }   // מתי סומן התשלום, ב-UTC
+    public int? PaidById { get; set; }      // המנהלת שסימנה
 }

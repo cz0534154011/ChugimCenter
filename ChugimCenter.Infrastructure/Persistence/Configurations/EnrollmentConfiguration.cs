@@ -28,6 +28,12 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
                .HasForeignKey(e => e.CancelledById)
                .OnDelete(DeleteBehavior.Restrict);
 
+        // המנהלת שסימנה את התשלום
+        builder.HasOne<User>()
+               .WithMany()
+               .HasForeignKey(e => e.PaidById)
+               .OnDelete(DeleteBehavior.Restrict);
+
         // רשת ביטחון: רישום פעיל אחד בלבד לכל משתתפת בכל קבוצה (רישומים מבוטלים לא נספרים)
         builder.HasIndex(e => new { e.UserId, e.CourseGroupId })
                .IsUnique()

@@ -45,6 +45,9 @@ public class EnrollmentRepository(AppDbContext context) : Repository<Enrollment>
         if (query.Status is not null)
             enrollments = enrollments.Where(e => e.Status == query.Status);
 
+        if (query.IsPaid is not null)
+            enrollments = enrollments.Where(e => e.IsPaid == query.IsPaid);
+
         return enrollments
             .OrderByDescending(e => e.EnrolledAt)
             .ToPagedResultAsync(query.Page, query.PageSize, ct);
