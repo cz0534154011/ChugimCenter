@@ -2,6 +2,8 @@ using ChugimCenter.API.Extensions;
 using ChugimCenter.API.Middleware;
 using ChugimCenter.Application;
 using ChugimCenter.Infrastructure;
+using ChugimCenter.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
 
@@ -31,6 +33,16 @@ try
 
     var app = builder.Build();
 
+    // Migrations אוטומטיות בעלייה: בסיס נתונים ריק מקבל את כל הטבלאות ונתוני ה-Seed, ובסיס קיים מקבל רק את מה שחסר.
+    // כך המערכת עולה בלי שום פעולה ידנית בבסיס הנתונים - גם במחשב וגם ב-Render.
+    // DbContext הוא Scoped, ולכן יוצרים לו scope זמני, מחוץ לבקשת HTTP
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+        app.Logger.LogInformation("Database migrations are up to date");
+    }
+
     // סדר ה-pipeline חשוב: כל בקשה עוברת את השורות מלמעלה למטה, והתשובה חוזרת מלמטה למעלה.
     // 1. טיפול בשגיאות ראשון (לפי הוראות המרצה): עוטף את כל ה-pipeline, ולכן תופס חריגה לא צפויה מכל שלב שאחריו ומחזיר 500 אחיד.
     // 2. CorrelationId: נותן מזהה לבקשה ומצרף אותו לכל שורות הלוג שלה.
@@ -42,7 +54,11 @@ try
     app.UseSwagger();
     app.UseSwaggerUI(options => options.DocumentTitle = "ChugimCenter API");
 
-    app.UseHttpsRedirection();
+    // הפניה ל-HTTPS רק בפיתוח. ב-Render ה-HTTPS מטופל לפני שהבקשה מגיעה לשרת, שמאזין ב-HTTP בתוך הקונטיינר
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
     app.UseCors(ApiServiceExtensions.ClientCorsPolicy);
 
     // קודם מזהים מי פונה (Authentication), ורק אחר כך בודקים מה מותר לה (Authorization)

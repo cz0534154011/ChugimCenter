@@ -1,0 +1,15 @@
+# קבצים שלא נכנסים לבניית ה-Docker: תוצרי בנייה של Windows, הגדרות אישיות, git ולוגים
+**/bin/
+**/obj/
+**/.vs/
+**/logs/
+**/*.user
+**/*.log
+.git/
+.github/
+.gitignore
+.gitattributes
+.dockerignore
+Dockerfile
+README.md
+ChugimCenter.Tests/
