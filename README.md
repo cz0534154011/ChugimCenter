@@ -2,6 +2,16 @@
 
 שרת ASP.NET Core Web API לאתר רישום לחוגי בנות במתנ"ס קהילתי אחד: ציור, דרמה, התעמלות, מוזיקה ועוד.
 
+## הפרויקט בענן (Render)
+
+| מה | קישור |
+|---|---|
+| האתר (לקוח React) | https://chugimcenter.onrender.com |
+| השרת – Swagger | https://chugimcenter-api.onrender.com/swagger |
+| קוד הלקוח | https://github.com/cz0534154011/ChugimCenter-Client |
+
+השרת והאתר רצים בתוכנית החינמית של Render. אחרי כרבע שעה בלי פעילות השרת "נרדם", והבקשה הראשונה אחרי זה יכולה לקחת עד כדקה. פרטי הכניסה בטבלת משתמשות הדמו למטה.
+
 ## תיאור המערכת
 
 המערכת מאפשרת למשתתפות להירשם לאתר, לצפות בחוגים ולהירשם לקבוצות. מדריכות רואות את הקבוצות שלהן ואת רשימות התלמידות, והמנהלת מנהלת תחומים, קבוצות, מדריכות, רישומים ותשלומים. יש שלושה תפקידים: Admin (מנהלת), Instructor (מדריכה) ו-Member (משתתפת). כל הרשאה נבדקת בשרת, לפי התפקיד שבתוך ה-JWT החתום, ובדיקת "הקבוצה שלך" נעשית מול בסיס הנתונים.
@@ -63,11 +73,7 @@
 
 ## הרצה מקומית
 
-דרישות: .NET SDK 10, ‏Docker Desktop, והכלי dotnet-ef:
-
-```
-dotnet tool install --global dotnet-ef
-```
+דרישות: .NET SDK 10 ו-Docker Desktop. הכלי dotnet-ef נדרש רק ליצירת Migrations חדשות, ולא להרצה.
 
 שלב 1 – הרמת PostgreSQL ב-Docker (במקום `<password>` בוחרים סיסמה):
 
@@ -88,13 +94,7 @@ dotnet user-secrets set "Jwt:Key" "<מפתח אקראי באורך 32 תווים
 $bytes = New-Object byte[] 64; [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes); [Convert]::ToBase64String($bytes)
 ```
 
-שלב 3 – יצירת בסיס הנתונים: הפקודה יוצרת את בסיס הנתונים, את כל הטבלאות ואת נתוני הדמו. אין צורך בשום פעולה ידנית נוספת בבסיס הנתונים.
-
-```
-dotnet ef database update -p ChugimCenter.Infrastructure -s ChugimCenter.API
-```
-
-שלב 4 – הרצת השרת:
+שלב 3 – הרצת השרת. בעלייה השרת מריץ בעצמו את ה-Migrations (`Database.MigrateAsync` ב-Program.cs): בפעם הראשונה נוצרים בסיס הנתונים, כל הטבלאות ונתוני הדמו, ובפעמים הבאות מתווסף רק מה שחסר. אין צורך בשום פעולה ידנית בבסיס הנתונים.
 
 ```
 dotnet run --project ChugimCenter.API --launch-profile https
@@ -109,6 +109,22 @@ Swagger נפתח ב-`https://localhost:7200/swagger` (או `http://localhost:521
 ```
 dotnet test
 ```
+
+## העלאה ל-Render
+
+- השרת: Web Service מסוג Docker, לפי `Dockerfile` שבשורש ה-repo. הבנייה בשני שלבים: ה-SDK בונה ומפרסם רק את `ChugimCenter.API`, ותמונת ה-runtime מריצה אותו על פורט 8080. ה-HTTPS מטופל ב-Render, ולכן ההפניה ל-HTTPS פעילה רק בסביבת פיתוח.
+- בסיס הנתונים: PostgreSQL 16 של Render, באותו אזור (Frankfurt). ה-Migrations ונתוני הדמו רצים אוטומטית בעליית השרת.
+- סודות: אין אף סוד בקוד או ב-repo. בענן הם מוגדרים כמשתני סביבה של השירות, ו-.NET קורא אותם כמו את appsettings (`__` מחליף את `:`):
+
+| משתנה | תוכן |
+|---|---|
+| `ConnectionStrings__Default` | מחרוזת החיבור לבסיס הנתונים, בפורמט `Host=...;Port=5432;Database=...;Username=...;Password=...` |
+| `Jwt__Key` | מפתח חתימה אקראי, שונה מזה של הפיתוח |
+| `Cors__AllowedOrigins__0` | כתובת האתר: `https://chugimcenter.onrender.com` |
+| `ASPNETCORE_ENVIRONMENT` | `Production` |
+| `PORT` | `8080` |
+
+- הלקוח: Static Site מה-repo `ChugimCenter-Client` (בנייה: `npm ci && npm run build`, תיקייה: `dist`, ‏`VITE_API_URL` עם כתובת השרת), וכלל Rewrite מ-`/*` ל-`/index.html` עבור React Router.
 
 ## משתמשות דמו
 
